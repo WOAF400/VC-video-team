@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14202B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Video Team">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Video Team Sunday Checklist</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one phone-width column; sticky "control strip" header (timecode + tabs), task rows below like a run sheet. */
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --ink:#14202B; --muted:#5B6875; --line:#D3DAE1;
+  --accent:#1F5FBF; --accent-soft:#E3ECF9; --tally:#1E9E5A; --tally-soft:#E2F3EA; --live:#C9362A;
+  --fiber-green:#2E9E4F; --fiber-red:#D23B2E; --fiber-yellow:#E3B40A;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F151B; --surface:#172029; --ink:#E6EDF3; --muted:#93A1AE; --line:#2A3743;
+  --accent:#7AA8F0; --accent-soft:#1C2B40; --tally:#3CC27A; --tally-soft:#16301F; --live:#F0655A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151B; --surface:#172029; --ink:#E6EDF3; --muted:#93A1AE; --line:#2A3743;
+  --accent:#7AA8F0; --accent-soft:#1C2B40; --tally:#3CC27A; --tally-soft:#16301F; --live:#F0655A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:14px 10px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,7vw,30px);line-height:1;margin:4px 0 0;letter-spacing:.01em;text-wrap:balance}
+.tc{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tc b{display:block;font-weight:500;font-size:17px;color:var(--ink);letter-spacing:.02em}
+.overall{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.overall i{display:block;height:100%;width:0;background:var(--tally);transition:width .3s}
+nav{display:flex;gap:6px;overflow-x:auto;padding-block:0 10px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font:600 14px/1 var(--f-body);padding:10px 12px;border-radius:999px;cursor:pointer;min-height:40px}
+.tab .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.tab[aria-selected="true"] .n{color:var(--surface);opacity:.75}
+.tab.done .dot{background:var(--tally)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.tab:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* role panel */
+main{padding-block:18px 48px}
+.role-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
+h2{font-family:var(--f-display);font-weight:700;font-size:24px;margin:0;line-height:1.1}
+.count{font-family:var(--f-mono);font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.role-sub{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:60ch}
+.banner{display:flex;gap:10px;align-items:center;background:var(--tally-soft);color:var(--ink);border:1px solid var(--tally);
+  border-radius:10px;padding:12px 14px;margin-bottom:16px;font-weight:600;font-size:15px}
+.banner .lamp{width:12px;height:12px;border-radius:50%;background:var(--tally);box-shadow:0 0 0 4px color-mix(in srgb,var(--tally) 25%,transparent)}
+.banner .t{margin-left:auto;font-family:var(--f-mono);font-weight:500;font-size:13px;color:var(--muted)}
+
+section.group{margin-bottom:22px}
+h3{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+h3 .num{font-family:var(--f-mono);color:var(--accent);letter-spacing:0}
+h3 .gc{margin-left:auto;font-family:var(--f-mono);letter-spacing:0;font-weight:500}
+ul.items{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.item+.item{border-top:1px solid var(--line)}
+.item{position:relative}
+.item.golive{box-shadow:inset 3px 0 0 var(--live)}
+.row{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;
+  padding:14px 52px 14px 14px;cursor:pointer;min-height:56px}
+.box{flex:0 0 26px;height:26px;border:2px solid var(--muted);border-radius:7px;display:grid;place-items:center;margin-top:1px;transition:background .15s,border-color .15s}
+.box svg{width:16px;height:16px;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.checked .box{background:var(--tally);border-color:var(--tally)}
+.checked .box svg{opacity:1;transform:none}
+.body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tagline{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tag{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.when{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.when.live{background:color-mix(in srgb,var(--live) 14%,transparent);color:var(--live)}
+.text{font-size:16px}
+.note{font-size:14px;color:var(--muted)}
+.stamp{font-family:var(--f-mono);font-size:12px;color:var(--tally);font-variant-numeric:tabular-nums}
+.checked .text{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.info{position:absolute;top:10px;right:8px;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface);
+  color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.info svg{width:18px;height:18px}
+.info[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.manual{margin:0 14px 14px 54px;padding:12px 14px;border-radius:8px;background:var(--bg);font-size:14px;color:var(--muted)}
+.manual strong{color:var(--ink);display:block;margin-bottom:2px;font-size:13px}
+.manual ol{margin:6px 0 0;padding-left:18px;color:var(--ink)}
+
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:8px}
+.btn{font:600 14px/1 var(--f-body);padding:12px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:44px}
+.btn.danger{color:var(--live);border-color:color-mix(in srgb,var(--live) 45%,var(--line))}
+.btn.confirm{background:var(--live);border-color:var(--live);color:#fff}
+.hint{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="eyebrow" id="dateLabel">Village Church · Sunday</div>
+        <h1>Video Team Sunday Checklist</h1>
+      </div>
+      <div class="tc"><b id="clock" aria-live="off">--:--</b>Now</div>
+    </div>
+    <div class="overall" aria-hidden="true"><i id="overallBar"></i></div>
+    <nav role="tablist" id="tabs" aria-label="Roles"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="panel" role="tabpanel"></main>
+
+<script>
+/* ===== Checklist data =====
+   Edit here to change items. Each item can later get a `manual` object:
+   manual: { summary: "…", steps: ["…","…"], tips: ["…"] }  (phase 2) */
+const ROLES = [
+  { id:"setup", name:"Setup & Capture", short:"Setup",
+    sub:"Videoland technical setup before the first service. Work top to bottom.",
+    groups:[
+      { name:"Physical & Signal Connectivity", items:[
+        { id:"s-power", tag:"Power", text:"Connect the main plug-in power cable." },
+        { id:"s-fiber-g", tag:"Fiber", swatch:"--fiber-green", text:"Connect the Green fiber cable from the Camera Rack." },
+        { id:"s-fiber-r", tag:"Fiber", swatch:"--fiber-red", text:"Connect the Red fiber cable from FOH." },
+        { id:"s-fiber-y", tag:"Fiber", swatch:"--fiber-yellow", text:"Connect the Yellow fiber cable from the Core Rack." },
+        { id:"s-loom", tag:"Sync", text:"Verify the Loom connection for Timecode (TC) and Genlock (GEN)." },
+        { id:"s-crestron", tag:"Connect", text:"Connect the 2× Crestron DM boxes (provided by BPAC) at the Core Rack.",
+          note:"These feed our CTR and IMAG video outputs to the BPAC video system." }
+      ]},
+      { name:"Software & Dashboard", items:[
+        { id:"s-macro", tag:"Dashboard", text:"Run a Setup Macro Check. Press Setup to verify the sequences." },
+        { id:"s-stage-tv", tag:"Stage Display", text:"Power on the stage TVs and verify connectivity." },
+        { id:"s-imag-ctr", tag:"IMAG & CTR", text:"Verify the IMAG and CTR outputs to BPAC." }
+      ]},
+      { name:"ProPresenter & GFX", items:[
+        { id:"s-lyrics", tag:"Content", text:"Download the lyrics playlist from Google Drive and load it into ProPresenter." },
+        { id:"s-timer", tag:"Timer", text:"Set the ProPresenter timer using PCO." },
+        { id:"s-routing", tag:"Routing", text:"Verify ProP CTR and ProP IMAG on the video switcher.",
+          note:"Also check ProP Stage Display out to the FOH TV and DSR TV." },
+        { id:"s-gfx", tag:"Graphics", text:"Do a final check of all announcement graphics." },
+        { id:"s-vk", tag:"VK Test", text:"Run a #Key (VK) number test." }
+      ]},
+      { name:"Recording & Communication", items:[
+        { id:"s-kipro", tag:"AJA KiPro", text:"Set the reel number and format the cards." },
+        { id:"s-comms", tag:"Intercom", text:"Set up the comms system and loop-check it." },
+        { id:"s-visuals", tag:"Visuals", text:"Do a final frame and focus check on all cameras." },
+        { id:"s-golive", tag:"Go-Live", when:"Go-live", live:true, text:"Start the ProPresenter clock to begin the countdown." }
+      ]}
+    ]},
+  { id:"camera", name:"Camera Operations", short:"Camera",
+    sub:"For each camera operator. Confirm with the director before the countdown starts.",
+    groups:[
+      { name:"Before Service", items:[
+        { id:"c-level", tag:"Levelling", text:"Make sure the cinema camera is perfectly level on the tripod." },
+        { id:"c-focus", tag:"Frame & Focus", text:"Set focus using the focus chart." },
+        { id:"c-sync", tag:"Sync", text:"Verify TC/GEN sync and matching timecode across all four cameras." },
+        { id:"c-media", tag:"Media", text:"Set the reel numbers and format all internal cards." },
+        { id:"c-comms", tag:"Comms", text:"Confirm clear two-way communication with the director from each camera." }
+      ]},
+      { name:"After First Service", items:[
+        { id:"c-capture", tag:"Verification", when:"After 1st service", text:"Do a capture file check right after the first service to confirm the recordings are intact." }
+      ]}
+    ]},
+  { id:"switcher", name:"Video Switcher", short:"Switcher",
+    sub:"For the switcher operator during the service.",
+    groups:[
+      { name:"During Service", items:[
+        { id:"v-frames", tag:"Frames", text:"Check every camera shot for framing and focus." },
+        { id:"v-sync", tag:"Sync", text:"Verify that timecode stays synchronized across all inputs." },
+        { id:"v-rolling", tag:"Status", when:"During service", live:true, text:"Confirm all recording decks and cameras show Rolling during the service." }
+      ]}
+    ]},
+  { id:"teardown", name:"Post-Service Tear Down", short:"Tear Down",
+    sub:"After the last service. Data first, then power, then the set.",
+    groups:[
+      { name:"Electronics & Data", items:[
+        { id:"t-usb", tag:"Storage", text:"Transfer the GFX USB to the “Football”." },
+        { id:"t-kipro", tag:"Power Down", text:"Off-load and shut down the KiPro players." },
+        { id:"t-systems", tag:"Systems", text:"Shut down the Dashboard and GFX computers properly." },
+        { id:"t-power", tag:"Main Power", text:"Power off all Videoland equipment." }
+      ]},
+      { name:"Striking the Set", items:[
+        { id:"t-cables", tag:"Cabling", swatch:"--fiber-yellow", text:"Unplug all rear connections. Store the power and Yellow fiber cables inside the Videoland case." },
+        { id:"t-lock", tag:"Security", text:"Close and lock all lids and doors." },
+        { id:"t-furniture", tag:"Furniture", text:"Pack down the tech chairs, tables and monitor arms." }
+      ]}
+    ]}
+];
+
+/* ===== State (per device, resets each day) ===== */
+const today = new Date();
+const dayKey = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+const STORE = "videoland:"+dayKey;
+let checks = {};
+try { checks = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch(e) { checks = {}; }
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(checks)); } catch(e) {} }
+try { // drop lists from earlier days
+  for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith("videoland:") && k !== STORE) localStorage.removeItem(k); }
+} catch(e) {}
+
+const openManual = new Set();
+const allItems = r => r.groups.flatMap(g => g.items);
+const doneCount = items => items.filter(i => checks[i.id]).length;
+const fmtTime = ts => new Date(ts).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let current = (location.hash || "").slice(1);
+if (!ROLES.some(r => r.id === current)) current = ROLES[0].id;
+
+document.getElementById("dateLabel").textContent =
+  "Village Church · " + today.toLocaleDateString([], {weekday:"short", month:"short", day:"numeric"});
+
+const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const BOOK_SVG = '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 3.5h8.5a3 3 0 013 3v10H7a3 3 0 01-3-3v-10z" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 7.5h5M7.5 10.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
+function renderTabs(){
+  document.getElementById("tabs").innerHTML = ROLES.map(r => {
+    const items = allItems(r), d = doneCount(items), full = d === items.length;
+    return `<button class="tab${full?" done":""}" role="tab" id="tab-${r.id}" aria-selected="${r.id===current}" data-role="${r.id}">
+      <span class="dot"></span>${esc(r.short)}<span class="n">${d}/${items.length}</span></button>`;
+  }).join("");
+  const all = ROLES.flatMap(allItems);
+  document.getElementById("overallBar").style.width = (doneCount(all) / all.length * 100) + "%";
+}
+
+function manualHTML(it){
+  const m = it.manual;
+  if (!m) return `<strong>Manual</strong>A step-by-step guide for this task will be added here.`;
+  return `<strong>Manual</strong>${m.summary ? esc(m.summary) : ""}`
+    + (m.steps ? `<ol>${m.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>` : "")
+    + (m.tips ? `<p>${m.tips.map(esc).join("<br>")}</p>` : "");
+}
+
+function renderPanel(){
+  const r = ROLES.find(x => x.id === current);
+  const items = allItems(r), d = doneCount(items);
+  const lastTs = Math.max(0, ...items.map(i => checks[i.id] || 0));
+  const p = document.getElementById("panel");
+  p.setAttribute("aria-labelledby", "tab-" + r.id);
+  p.innerHTML = `
+    <div class="role-head"><h2>${esc(r.name)}</h2><span class="count">${d} / ${items.length}</span></div>
+    <p class="role-sub">${esc(r.sub)}</p>
+    ${d === items.length ? `<div class="banner" role="status"><span class="lamp"></span>All clear<span class="t">${fmtTime(lastTs)}</span></div>` : ""}
+    ${r.groups.map((g, gi) => `
+      <section class="group">
+        <h3>${r.groups.length > 1 ? `<span class="num">${gi+1}</span>` : ""}${esc(g.name)}<span class="gc">${doneCount(g.items)}/${g.items.length}</span></h3>
+        <ul class="items">${g.items.map(it => {
+          const on = !!checks[it.id], open = openManual.has(it.id);
+          return `<li class="item${on?" checked":""}${it.live?" golive":""}">
+            <button class="row" role="checkbox" aria-checked="${on}" data-id="${it.id}">
+              <span class="box">${CHECK_SVG}</span>
+              <span class="body">
+                <span class="tagline"><span class="tag">${esc(it.tag)}</span>${it.swatch ? `<span class="sw" style="background:var(${it.swatch})"></span>` : ""}${it.when ? `<span class="when${it.live?" live":""}">${esc(it.when)}</span>` : ""}</span>
+                <span class="text">${esc(it.text)}</span>
+                ${it.note ? `<span class="note">${esc(it.note)}</span>` : ""}
+                ${on ? `<span class="stamp">Checked ${fmtTime(checks[it.id])}</span>` : ""}
+              </span>
+            </button>
+            <button class="info" aria-label="Manual: ${esc(it.tag)}" aria-expanded="${open}" data-manual="${it.id}">${BOOK_SVG}</button>
+            <div class="manual" ${open ? "" : "hidden"}>${manualHTML(it)}</div>
+          </li>`;}).join("")}
+        </ul>
+      </section>`).join("")}
+    <div class="foot">
+      <span class="hint">Checks are saved on this device and clear at the start of each day.</span>
+      <button class="btn danger" id="resetBtn" data-role="${r.id}">Reset ${esc(r.short)}</button>
+    </div>`;
+}
+
+function render(){ renderTabs(); renderPanel(); }
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-role]"); if (!b) return;
+  current = b.dataset.role;
+  try { history.replaceState(null, "", "#" + current); } catch(err) {}
+  render(); window.scrollTo({top:0});
+});
+
+let resetArmed = null;
+document.getElementById("panel").addEventListener("click", e => {
+  const row = e.target.closest(".row");
+  if (row) { const id = row.dataset.id; if (checks[id]) delete checks[id]; else checks[id] = Date.now(); save(); render();
+    const again = document.querySelector(`.row[data-id="${id}"]`); if (again) again.focus({preventScroll:true}); return; }
+  const info = e.target.closest(".info");
+  if (info) { const id = info.dataset.manual; openManual.has(id) ? openManual.delete(id) : openManual.add(id); renderPanel(); return; }
+  const rb = e.target.closest("#resetBtn");
+  if (rb) {
+    if (resetArmed) { clearTimeout(resetArmed); resetArmed = null;
+      allItems(ROLES.find(x => x.id === rb.dataset.role)).forEach(i => delete checks[i.id]); save(); render(); return; }
+    rb.textContent = "Tap again to reset"; rb.classList.add("confirm");
+    resetArmed = setTimeout(() => { resetArmed = null; renderPanel(); }, 3000);
+  }
+});
+
+/* current time */
+const clockEl = document.getElementById("clock");
+function tick(){ clockEl.textContent = new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit", second:"2-digit"}); }
+tick();
+setInterval(tick, 1000);
+
+/* offline support when self-hosted (needs manifest + sw.js beside this page) */
+if (document.querySelector('link[rel="manifest"]') && "serviceWorker" in navigator) {
+  try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch(e) {}
+}
+
+render();
+</script>
+
+</body>
+</html>
